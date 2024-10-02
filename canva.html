@@ -59,15 +59,18 @@
 
     <script type="text/javascript">
       document.addEventListener("DOMContentLoaded", function() {
-
         const text = '<textarea class="full-width-textarea" placeholder="Digite seu conteúdo aqui..."></textarea>';
-
-        var items = [
-          { content: text, h: 2 },
-          { w: 2, content: '<textarea class="full-width-textarea" placeholder="Este é um widget maior para conteúdos mais longos!"></textarea>', h: 2 },
-          { content: text, h: 2, x: 2 },
-          { w: 2, content: '<textarea class="full-width-textarea" placeholder="Experimente mover e redimensionar os widgets!"></textarea>', h: 3, y: 2 }
-        ];
+        
+        // Função para carregar itens do localStorage
+        function loadItems() {
+          const savedItems = localStorage.getItem('gridItems');
+          return savedItems ? JSON.parse(savedItems) : [
+            { content: text, h: 2 },
+            { w: 2, content: '<textarea class="full-width-textarea" placeholder="Este é um widget maior para conteúdos mais longos!"></textarea>', h: 2 },
+            { content: text, h: 2, x: 2 },
+            { w: 2, content: '<textarea class="full-width-textarea" placeholder="Experimente mover e redimensionar os widgets!"></textarea>', h: 3, y: 2 }
+          ];
+        }
 
         var grid = GridStack.init({
           cellHeight: '80px',
@@ -75,7 +78,20 @@
           animate: true
         });
 
-        grid.load(items);
+        // Carregar itens no grid
+        grid.load(loadItems());
+
+        // Função para salvar os itens no localStorage
+        function saveGridState() {
+          const gridItems = grid.save();
+          localStorage.setItem('gridItems', JSON.stringify(gridItems));
+        }
+
+        // Evento disparado ao mover ou redimensionar widgets
+        grid.on('change', saveGridState);
+
+        // Salvar a posição ao sair da página
+        window.addEventListener('beforeunload', saveGridState);
       });
     </script>
   </body>
